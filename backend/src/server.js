@@ -17,7 +17,7 @@ app.use(passport.initialize());
 // Usar las rutas
 app.use("/api", postRoutes);
 app.use("/api", commentRoutes);
-app.use("/api/auth", userRoutes);
+app.use("/api", userRoutes);
 
 app.get("/", (req, res) => {
   res.send("¡Hola desde tu backend!");

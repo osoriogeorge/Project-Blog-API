@@ -1,28 +1,30 @@
 const { PrismaClient } = require("../../generated/prisma");
+const { validationResult } = require("express-validator");
 const bcrypt = require("bcrypt"); // Para hashear contraseñas
 const jwt = require("jsonwebtoken"); // Para crear JWTs
 const prisma = new PrismaClient();
 
 // Registrar un nuevo usuario
 exports.registerUser = async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
   const { username, password, isAdmin } = req.body;
 
   // Validaciones básicas
   if (!username || typeof username !== "string" || username.trim() === "") {
-    return res
-      .status(400)
-      .json({
-        error:
-          "El nombre de usuario es requerido y debe ser una cadena de texto no vacía.",
-      });
+    return res.status(400).json({
+      error:
+        "El nombre de usuario es requerido y debe ser una cadena de texto no vacía.",
+    });
   }
 
   if (!password || typeof password !== "string" || password.length < 6) {
-    return res
-      .status(400)
-      .json({
-        error: "La contraseña es requerida y debe tener al menos 6 caracteres.",
-      });
+    return res.status(400).json({
+      error: "La contraseña es requerida y debe tener al menos 6 caracteres.",
+    });
   }
 
   // isAdmin es opcional, pero si se proporciona, debe ser un booleano

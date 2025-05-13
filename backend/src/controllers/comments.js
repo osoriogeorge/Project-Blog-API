@@ -3,14 +3,52 @@ const prisma = new PrismaClient();
 
 exports.getAllCommentsForPost = async (req, res) => {
   const { postId } = req.params;
+  const { page = 1, limit = 10 } = req.query; // Obtener parámetros de página y límite con valores por defecto
+  const pageNumber = parseInt(page);
+  const pageSize = parseInt(limit);
+
+  if (
+    isNaN(pageNumber) ||
+    pageNumber < 1 ||
+    isNaN(pageSize) ||
+    pageSize < 1 ||
+    pageSize > 100
+  ) {
+    return res.status(400).json({
+      error:
+        'Los parámetros "page" y "limit" deben ser números positivos válidos (limit <= 100).',
+    });
+  }
+
   try {
+    const skip = (pageNumber - 1) * pageSize;
+    const totalComments = await prisma.comment.count({
+      where: { postId: parseInt(postId) },
+    });
     const comments = await prisma.comment.findMany({
       where: { postId: parseInt(postId) },
       include: { user: true },
+      skip,
+      take: pageSize,
+      orderBy: { createdAt: "desc" }, // Opcional: ordenar por fecha de creación
     });
-    res.json(comments);
+
+    const totalPages = Math.ceil(totalComments / pageSize);
+    const currentPage = pageNumber;
+
+    const response = {
+      data: comments,
+      pagination: {
+        totalItems: totalComments,
+        totalPages,
+        currentPage,
+        pageSize,
+      },
+    };
+
+    res.json(response);
   } catch (error) {
-    console.error("Error al obtener los comentarios:", error);
+    console.error("Error al obtener los comentarios paginados:", error);
     res
       .status(500)
       .json({ error: "Ocurrió un error al obtener los comentarios." });
