@@ -9,6 +9,8 @@ const port = 3000;
 const helmet = require("helmet");
 const cors = require("cors");
 
+const morgan = require("morgan");
+
 const postRoutes = require("./routes/posts");
 const commentRoutes = require("./routes/comments");
 const userRoutes = require("./routes/users");
@@ -17,6 +19,8 @@ const userRoutes = require("./routes/users");
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+
+app.use(morgan("dev"));
 
 app.use(passport.initialize());
 
