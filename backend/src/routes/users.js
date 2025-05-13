@@ -7,7 +7,7 @@ const adminAuthMiddleware = require("../middleware/adminAuth");
 
 // Ruta para registrar un nuevo usuario
 router.post(
-  "/auth/register",
+  "/register",
   [
     body("username")
       .notEmpty()

@@ -57,7 +57,8 @@ exports.getAllPublishedPosts = async (req, res) => {
 };
 
 // Obtener una publicación por ID
-exports.getPostById = async (req, res) => {
+exports.getPostById = async (req, res, next) => {
+  // <-- Elimina la flecha aquí
   const { id } = req.params;
   try {
     const post = await prisma.post.findUnique({
@@ -69,10 +70,7 @@ exports.getPostById = async (req, res) => {
     }
     res.json(post);
   } catch (error) {
-    console.error("Error al obtener la publicación:", error);
-    res
-      .status(500)
-      .json({ error: "Ocurrió un error al obtener la publicación." });
+    next(error);
   }
 };
 

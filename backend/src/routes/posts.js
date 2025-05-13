@@ -9,7 +9,13 @@ const adminAuthMiddleware = require("../middleware/adminAuth");
 router.get("/posts", postController.getAllPublishedPosts);
 
 // Obtener una publicación por ID (no requiere autenticación)
-router.get("/posts/:id", postController.getPostById);
+router.get("/posts/:id", async (req, res, next) => {
+  try {
+    await postController.getPostById(req, res, next);
+  } catch (error) {
+    next(error);
+  }
+});
 
 // Crear una nueva publicación (requiere autenticación)
 router.post(
